@@ -152,3 +152,35 @@ function transformer(ast) {
 
     return svg_ast
 }
+
+
+/* 
+    Takes the AST (doesn't matter if it's been
+    transformed or not, it could be either case)
+    and outputs new generated code
+
+    JS compilers like Babel don't optimize this 
+    generator section for code-friendlyness but 
+    instead just outputting things that work for 
+    the machine
+*/
+function generator(svg_ast) {
+    /* 
+        Objective is to generate a SVG tag,
+        which is the output that we want
+    */
+
+    function createAttrString(attr) {
+        return Object.keys(attr).map(function (key) {
+            return key + '="' + attr[key] + '"'
+        }).join(" ")
+    }
+
+    var svg_attr = createAttrString(svg_ast.attr)
+
+    var elements = svg_ast.body.map(function (node) {
+        return "<" + node.tag + " " + createAttrString(node.attr) + "></" + node.tag + ">"
+    }).join("\n\t")
+
+    return "<svg " + svg_attr + ">\n" + elements + "\n</svg>"
+}
